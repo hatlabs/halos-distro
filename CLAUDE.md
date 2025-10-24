@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Workflow Policy
+
+**IMPORTANT:** Always ask the user before:
+- Committing files to git
+- Pushing commits to remote repositories
+- Creating or modifying git tags
+- Running destructive git operations
+
+This applies to all repositories in this monorepo, including submodules.
+
 ## Documentation Strategy
 
 This is a monorepo with multiple independent components managed as git submodules. Each submodule has its own CLAUDE.md file with detailed, component-specific documentation:
@@ -19,7 +29,7 @@ This approach keeps context focused and relevant, improving efficiency and maint
 
 ## Project Overview
 
-HaLOS (Hat Labs Operating System) is a custom Raspberry Pi OS distribution with pre-installed web management tools. The name is a play on GLaDOS and HAL 9000.
+Halos (Hat Labs Operating System) is a custom Raspberry Pi OS distribution with pre-installed web management tools. The name is a play on GLaDOS and HAL 9000.
 
 **Core Components:**
 - **Cockpit** (port 9090): Web-based system administration interface
@@ -27,18 +37,20 @@ HaLOS (Hat Labs Operating System) is a custom Raspberry Pi OS distribution with 
 
 **Image Variants:**
 
+Halos uses headless-first naming. Desktop variants include `-Desktop-` in the name.
+
 | Image | Hardware | Desktop? | Marine? |
 |-------|----------|----------|---------|
-| **HaLOS-Marine-HALPI2** | HALPI2 | Yes | Yes |
-| **HaLOS-Marine-Lite-HALPI2** | HALPI2 | No | Yes |
-| **HaLOS-HALPI2** | HALPI2 | Yes | No |
-| **HaLOS-Lite-HALPI2** | HALPI2 | No | No |
-| **HaLOS-Marine-RPI** | Generic Pi | Yes | Yes |
-| **HaLOS-Marine-Lite-RPI** | Generic Pi | No | Yes |
-| **HaLOS-RPI** | Generic Pi | Yes | No |
-| **HaLOS-Lite-RPI** | Generic Pi | No | No |
+| **Halos-HALPI2** | HALPI2 | No | No |
+| **Halos-Desktop-HALPI2** | HALPI2 | Yes | No |
+| **Halos-Marine-HALPI2** | HALPI2 | No | Yes |
+| **Halos-Desktop-Marine-HALPI2** | HALPI2 | Yes | Yes |
+| **Halos-RPI** | Generic Pi | No | No |
+| **Halos-Desktop-RPI** | Generic Pi | Yes | No |
+| **Halos-Marine-RPI** | Generic Pi | No | Yes |
+| **Halos-Desktop-Marine-RPI** | Generic Pi | Yes | Yes |
 
-All images include Cockpit and CasaOS. HALPI2 variants add hardware-specific drivers. Marine variants add Signal K, InfluxDB, and Grafana.
+All images include Cockpit (web system admin) and CasaOS (container management). HALPI2 variants add hardware-specific drivers and the halpid daemon. Marine variants add Signal K, InfluxDB, and Grafana.
 
 ## Monorepo Structure
 
@@ -46,7 +58,7 @@ All images include Cockpit and CasaOS. HALPI2 variants add hardware-specific dri
 halos-distro/                          # Monorepo aggregator (this repo)
 ├── CLAUDE.md                          # Architecture overview (you are here)
 └── submodules/
-    ├── halos-pi-gen/                  # HaLOS image builder (pi-gen based)
+    ├── halos-pi-gen/                  # Halos image builder (pi-gen based)
     │   ├── CLAUDE.md                  # Detailed build system documentation
     │   ├── stage-halos-base/          # Cockpit + CasaOS for all variants
     │   ├── stage-halos-marine/        # Marine software stack
@@ -112,7 +124,7 @@ See [halos-pi-gen/CLAUDE.md](halos-pi-gen/CLAUDE.md) for detailed build instruct
 
 ```bash
 cd halos-pi-gen
-./run docker-build "HaLOS-Marine-HALPI2"  # Build specific variant
+./run docker-build "Halos-Marine-HALPI2"  # Build specific variant
 ./run docker-build-all                     # Build all enabled variants
 ```
 
