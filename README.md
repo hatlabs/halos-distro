@@ -10,5 +10,4 @@ This repository acts as a monorepo for all the components that make up Halos.
 
 - halos-pi-gen/ - Custom Raspberry Pi image builder (submodule)
 - casaos-marine-store/ - Custom marine app store repository for CasaOS (submodule)
-- casaos-docker-service/ - systemd service files and Debian packaging for CasaOS Docker deployment (submodule)
 - apt.hatlabs.fi/ - Custom APT repository for Halos packages (submodule)

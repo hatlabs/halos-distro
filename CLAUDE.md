@@ -11,7 +11,6 @@ For git workflow policies that apply to all repositories in this monorepo, see t
 This is a monorepo with multiple independent components managed as git submodules. Each submodule has its own CLAUDE.md file with detailed, component-specific documentation:
 
 - **[halos-pi-gen/CLAUDE.md](halos-pi-gen/CLAUDE.md)**: Detailed pi-gen build system, stages, image variants, CI/CD workflows
-- **[casaos-docker-service/CLAUDE.md](casaos-docker-service/CLAUDE.md)**: CasaOS deployment and configuration
 - **[casaos-marine-store/CLAUDE.md](casaos-marine-store/CLAUDE.md)**: Marine app store structure and curation
 
 **When to use which documentation:**
@@ -45,10 +44,9 @@ halos-distro/                          # Monorepo aggregator (this repo)
     │   ├── stage-halos-marine/        # Marine software stack
     │   ├── stage-halpi2-common/       # HALPI2 hardware support
     │   └── config.*                   # Image variant configurations
-    ├── casaos-docker-service/         # CasaOS containerized deployment
-    │   └── CLAUDE.md                  # CasaOS-specific documentation
-    └── casaos-marine-store/           # Curated marine apps
-        └── CLAUDE.md                  # App store documentation
+    ├── casaos-marine-store/           # Curated marine apps
+    │   └── CLAUDE.md                  # App store documentation
+    └── apt.hatlabs.fi/                # Custom APT repository
 ```
 
 **Note:** Legacy OpenPlotter and HALPI (CM4) images are built in a separate repository: `openplotter-halpi` (not part of this monorepo). That repository maintains Bookworm-based images for older Hat Labs hardware.
