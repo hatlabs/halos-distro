@@ -10,3 +10,6 @@
 	path = apt.hatlabs.fi
 	url = git@github.com:hatlabs/apt.hatlabs.fi.git
 	branch = main
+[submodule "runtipi-marine-app-store"]
+	path = runtipi-marine-app-store
+	url = git@github.com:hatlabs/runtipi-marine-app-store.git
