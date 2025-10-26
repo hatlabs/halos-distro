@@ -12,7 +12,6 @@ This is a monorepo with multiple independent components managed as git submodule
 
 - **[halos-pi-gen/CLAUDE.md](halos-pi-gen/CLAUDE.md)**: Detailed pi-gen build system, stages, image variants, CI/CD workflows
 - **[runtipi-marine-app-store/CLAUDE.md](runtipi-marine-app-store/CLAUDE.md)**: Runtipi marine app store structure and curation
-- **[casaos-marine-store/CLAUDE.md](casaos-marine-store/CLAUDE.md)**: CasaOS marine app store (legacy, transitioning to Runtipi)
 
 **When to use which documentation:**
 - Working in a specific submodule? Read that submodule's CLAUDE.md for detailed context
@@ -46,8 +45,6 @@ halos-distro/                          # Monorepo aggregator (this repo)
     │   ├── stage-halpi2-common/       # HALPI2 hardware support
     │   └── config.*                   # Image variant configurations
     ├── runtipi-marine-app-store/      # Runtipi marine app store
-    │   └── CLAUDE.md                  # App store documentation
-    ├── casaos-marine-store/           # CasaOS marine apps (legacy)
     │   └── CLAUDE.md                  # App store documentation
     └── apt.hatlabs.fi/                # Custom APT repository
 ```

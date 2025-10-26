@@ -2,10 +2,6 @@
 	path = halos-pi-gen
 	url = git@github.com:hatlabs/halos-pi-gen.git
 	branch = halos
-[submodule "casaos-marine-store"]
-	path = casaos-marine-store
-	url = git@github.com:hatlabs/casaos-marine-store.git
-	branch = main
 [submodule "apt.hatlabs.fi"]
 	path = apt.hatlabs.fi
 	url = git@github.com:hatlabs/apt.hatlabs.fi.git
