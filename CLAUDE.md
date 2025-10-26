@@ -2,6 +2,8 @@
 
 Halos (Hat Labs Operating System) - custom Raspberry Pi OS distribution with web management.
 
+The monorepo structure is for convenience only! Each submodule must work independently and can have no directory-level cross-dependencies.
+
 ## Git Workflow Policy
 
 **IMPORTANT:** Always ask before committing, pushing, tagging, or running destructive git operations.
@@ -35,14 +37,6 @@ cd halos-pi-gen
 2. **Web Management** (all): Cockpit (9090) + Runtipi (80/443)
 3. **Hardware** (HALPI2 only): HALPI2 drivers, CAN, RS-485, I2C
 4. **Marine** (marine variants): Signal K (3000) → InfluxDB (8086) → Grafana (3001)
-
-## Image Naming
-
-`HaLOS[-Lite]-[Marine-]<HALPI2|RPI>`
-
-- **Lite**: Headless (no desktop)
-- **Marine**: Pre-configured marine stack
-- **HALPI2/RPI**: Hardware target
 
 ## Submodule Workflow
 
