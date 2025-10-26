@@ -35,6 +35,7 @@ declare -A REPOS=(
   ["apt.hatlabs.fi"]="git@github.com:hatlabs/apt.hatlabs.fi.git main"
   ["runtipi-marine-app-store"]="git@github.com:hatlabs/runtipi-marine-app-store.git main"
   ["runtipi-docker-service"]="git@github.com:hatlabs/runtipi-docker-service.git main"
+  ["avnav-docker"]="git@github.com:hatlabs/avnav-docker.git main"
 )
 
 ################################################################################
