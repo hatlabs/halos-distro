@@ -1,134 +1,56 @@
-# CLAUDE.md
+# HaLOS Monorepo
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Halos (Hat Labs Operating System) - custom Raspberry Pi OS distribution with web management.
 
 ## Git Workflow Policy
 
-For git workflow policies that apply to all repositories in this monorepo, see the Git Workflow Policy section in @halos-pi-gen/CLAUDE.md
+**IMPORTANT:** Always ask before committing, pushing, tagging, or running destructive git operations.
 
-## Documentation Strategy
-
-This is a monorepo with multiple independent components managed as git submodules. Each submodule has its own CLAUDE.md file with detailed, component-specific documentation:
-
-- **[halos-pi-gen/CLAUDE.md](halos-pi-gen/CLAUDE.md)**: Detailed pi-gen build system, stages, image variants, CI/CD workflows
-- **[runtipi-marine-app-store/CLAUDE.md](runtipi-marine-app-store/CLAUDE.md)**: Runtipi marine app store structure and curation
-
-**When to use which documentation:**
-- Working in a specific submodule? Read that submodule's CLAUDE.md for detailed context
-- Understanding the overall architecture? This file provides the big picture
-- Making changes that span multiple components? Start here, then dive into submodule docs
-
-This approach keeps context focused and relevant, improving efficiency and maintainability.
-
-## Project Overview
-
-Halos (Hat Labs Operating System) is a custom Raspberry Pi OS distribution with pre-installed web management tools. The name is a play on GLaDOS and HAL 9000.
-
-**Core Components:**
-- **Cockpit** (port 9090): Web-based system administration interface
-- **Runtipi** (port 80/443): Container and app management with user-friendly UI
-
-## Image Variants
-
-For detailed information about image variants, naming conventions, and configuration options, see the Image Variants section in @halos-pi-gen/CLAUDE.md
-
-## Monorepo Structure
+## Structure
 
 ```
-halos-distro/                          # Monorepo aggregator (this repo)
-├── CLAUDE.md                          # Architecture overview (you are here)
-└── submodules/
-    ├── halos-pi-gen/                  # Halos image builder (pi-gen based)
-    │   ├── CLAUDE.md                  # Detailed build system documentation
-    │   ├── stage-halos-base/          # Cockpit + Runtipi for all variants
-    │   ├── stage-halos-marine/        # Marine software stack
-    │   ├── stage-halpi2-common/       # HALPI2 hardware support
-    │   └── config.*                   # Image variant configurations
-    ├── runtipi-marine-app-store/      # Runtipi marine app store
-    │   └── CLAUDE.md                  # App store documentation
-    └── apt.hatlabs.fi/                # Custom APT repository
+halos-distro/
+├── halos-pi-gen/                  # Image builder (submodule)
+├── runtipi-marine-app-store/      # Marine app store (submodule)
+├── runtipi-docker-service/        # Runtipi Debian package
+└── apt.hatlabs.fi/                # Custom APT repo (submodule)
 ```
 
-**Note:** Legacy OpenPlotter and HALPI (CM4) images are built in a separate repository: `openplotter-halpi` (not part of this monorepo). That repository maintains Bookworm-based images for older Hat Labs hardware.
+**Each submodule has its own CLAUDE.md** - read the appropriate one for detailed context.
 
-## High-Level Architecture
-
-### Layer 1: Base Operating System
-- Debian-based Raspberry Pi OS (arm64, trixie)
-- Built using pi-gen (official Raspberry Pi image builder)
-- Hardware support: Generic Raspberry Pi or HALPI2 (CM5-based) compute modules
-
-### Layer 2: Web Management (All Variants)
-- **Cockpit**: System monitoring, service management, terminal access, file management
-- **Runtipi**: Docker container management, app store interface
-
-### Layer 3: Hardware Support (HALPI2 Variants Only)
-- Hat Labs APT repository (apt.hatlabs.fi)
-- Hardware daemon (halpid) and firmware
-- I2C, CAN bus, RS-485, UART interfaces
-- External antenna support
-- USB/NVMe boot priority (SD card disabled)
-
-### Layer 4: Marine Services (Marine Variants Only)
-```
-Marine sensors → Signal K (port 3000) → InfluxDB (port 8086)
-                                              ↓
-                                          Grafana (port 3001)
-```
-
-Services run in Docker containers managed through Runtipi with persistent volumes.
-
-## Common Development Commands
-
-### Working with Submodules
+## Quick Start
 
 ```bash
-# Initialize all submodules
+# Initialize submodules
 git submodule update --init --recursive
 
-# Update all submodules to latest
-git submodule update --remote
+# Build an image
+cd halos-pi-gen
+./run docker-build "HaLOS-Marine-HALPI2"
+```
 
+## Architecture Layers
+
+1. **Base OS**: Debian-based Raspberry Pi OS (arm64, trixie) built with pi-gen
+2. **Web Management** (all): Cockpit (9090) + Runtipi (80/443)
+3. **Hardware** (HALPI2 only): HALPI2 drivers, CAN, RS-485, I2C
+4. **Marine** (marine variants): Signal K (3000) → InfluxDB (8086) → Grafana (3001)
+
+## Image Naming
+
+`HaLOS[-Lite]-[Marine-]<HALPI2|RPI>`
+
+- **Lite**: Headless (no desktop)
+- **Marine**: Pre-configured marine stack
+- **HALPI2/RPI**: Hardware target
+
+## Submodule Workflow
+
+```bash
 # Update specific submodule
 cd halos-pi-gen
 git pull origin main
 cd ..
 git add halos-pi-gen
-git commit -m "Update halos-pi-gen submodule"
+git commit -m "Update halos-pi-gen"
 ```
-
-## Build and Release Pipeline
-
-For detailed information about the build and release pipeline, including Debian package building and CI/CD workflows, see the Build and Release Pipeline section in @halos-pi-gen/CLAUDE.md
-
-## Technology Stack
-
-For comprehensive technology stack information, see the Technology Stack section in @halos-pi-gen/CLAUDE.md
-
-## Development Workflow
-
-For component-specific development workflows and patterns, see the Creating New Image Variants and Common Development Patterns sections in @halos-pi-gen/CLAUDE.md
-
-### Making Changes to a Specific Component
-
-1. Navigate to the appropriate submodule directory
-2. Read that submodule's CLAUDE.md for detailed context
-3. Make changes following the patterns documented there
-4. Test locally if applicable
-5. Commit in the submodule, then update the parent repo reference
-
-### Making Cross-Component Changes
-
-1. Review this architecture overview
-2. Identify which submodules are affected
-3. Read the CLAUDE.md for each affected submodule
-4. Make coordinated changes
-5. Test the integration
-6. Update submodule references in parent repo
-
-## Important Notes
-
-- All images include both Cockpit (port 9090) and Runtipi (port 80/443)
-- Marine variants include pre-configured Signal K, InfluxDB, and Grafana
-- HALPI2 variants include hardware-specific drivers and configurations
-- Default boot (HALPI2) is from USB/NVMe (SD card disabled to prevent wear)
