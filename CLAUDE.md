@@ -1,8 +1,8 @@
-# HaLOS Monorepo
+# HaLOS Workspace
 
 Halos (Hat Labs Operating System) - custom Raspberry Pi OS distribution with web management.
 
-The monorepo structure is for convenience only! Each submodule must work independently and can have no directory-level cross-dependencies.
+This workspace manages multiple independent repositories for convenience. Each repository must work independently and can have no directory-level cross-dependencies.
 
 ## Git Workflow Policy
 
@@ -18,17 +18,20 @@ halos-distro/
 └── apt.hatlabs.fi/                # Custom APT repo (submodule)
 ```
 
-**Each submodule has its own CLAUDE.md** - read the appropriate one for detailed context.
+**Each repository has its own CLAUDE.md** - read the appropriate one for detailed context.
 
 ## Quick Start
 
 ```bash
-# Initialize submodules
-git submodule update --init --recursive
+# Clone all component repositories
+./run repos:clone
+
+# Update all repositories
+./run repos:pull-all-main
 
 # Build an image
 cd halos-pi-gen
-./run docker-build "HaLOS-Marine-HALPI2"
+./run docker-build "Halos-Marine-HALPI2"
 ```
 
 ## Architecture Layers
@@ -38,13 +41,20 @@ cd halos-pi-gen
 3. **Hardware** (HALPI2 only): HALPI2 drivers, CAN, RS-485, I2C
 4. **Marine** (marine variants): Signal K (3000) → InfluxDB (8086) → Grafana (3001)
 
-## Submodule Workflow
+## Repository Management
 
 ```bash
-# Update specific submodule
+# Update all repositories to latest main/halos branches
+./run repos:pull-all-main
+
+# Check status of all repositories
+./run repos:status
+
+# Work in a specific repository
 cd halos-pi-gen
-git pull origin main
+git pull origin halos
+# make changes, commit, push
 cd ..
-git add halos-pi-gen
-git commit -m "Update halos-pi-gen"
 ```
+
+Each repository is managed independently. The halos-distro workspace tracks only shared documentation and convenience scripts.

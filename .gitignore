@@ -1,1 +1,7 @@
 CLAUDE.local.md
+
+# Sub-repositories (managed by ./run script)
+halos-pi-gen/
+apt.hatlabs.fi/
+runtipi-marine-app-store/
+runtipi-docker-service/
