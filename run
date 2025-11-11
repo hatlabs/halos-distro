@@ -37,6 +37,7 @@ declare -A REPOS=(
   ["runtipi-docker-service"]="git@github.com:hatlabs/runtipi-docker-service.git main"
   ["avnav-docker"]="git@github.com:hatlabs/avnav-docker.git main"
   ["opencpn-docker"]="git@github.com:hatlabs/opencpn-docker.git main"
+  ["cockpit-apt"]="git@github.com:hatlabs/cockpit-apt.git main"
 )
 
 ################################################################################

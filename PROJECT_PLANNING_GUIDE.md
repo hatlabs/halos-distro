@@ -90,6 +90,11 @@ For each major component, create tasks with:
 - Caveats and considerations
 - Dependencies on other tasks
 
+**Format Guidelines:**
+- DO NOT include time estimates (no weeks, months, days, hours)
+- Focus on task dependencies and order, not duration
+- Keep task descriptions actionable and clear
+
 **Purpose:** This temporary file helps plan and discuss the implementation before creating GitHub issues.
 
 **Human reviews and approves:** Review TASKS.md and request changes if needed before proceeding to create issues
@@ -280,6 +285,7 @@ You: Approve or adjust
 - Review critical code paths manually
 - Update docs/ files to reflect actual implementation
 - Use semantic versioning for releases
+- Avoid time estimates in planning documents (focus on dependencies and order)
 
 ### Don't
 
