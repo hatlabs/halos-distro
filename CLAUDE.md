@@ -15,6 +15,7 @@ halos-distro/
 ├── halos-pi-gen/                  # Image builder (submodule)
 ├── runtipi-marine-app-store/      # Marine app store (submodule)
 ├── runtipi-docker-service/        # Runtipi Debian package
+├── cockpit-apt/                   # Cockpit APT package manager
 └── apt.hatlabs.fi/                # Custom APT repo (submodule)
 ```
 
