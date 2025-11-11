@@ -262,7 +262,57 @@ Halos is transitioning to a unified Cockpit-based administration experience. Thi
 **Documentation**:
 - [docs/WIFI_CONFIG_DESIGN.md](docs/WIFI_CONFIG_DESIGN.md) - WiFi configuration concept
 
-### Phase 4: Upstream & Community (Long-term)
+### Phase 3.5: Dashboard Integration (Future)
+
+**Goal**: Unified landing page with Homarr dashboard
+
+**Status**: Design Complete (after Phase 3)
+
+**Deliverables**:
+- Homarr packaged as `homarr-container`
+- Rust adapter service (`homarr-container-adapter`) for auto-discovery
+- Auto-discovery of installed apps via Docker labels
+- Pre-installed in HaLOS images
+
+**Key Features**:
+- Default landing page at `http://halos.local/`
+- Auto-discovery of newly installed container apps
+- User-customizable dashboard (add/remove/reorder apps)
+- Quick access to Cockpit and all installed apps
+- System status widgets (CPU, memory, disk)
+- Mobile-friendly responsive design
+
+**Documentation**:
+- [docs/HOMARR_INTEGRATION_DESIGN.md](docs/HOMARR_INTEGRATION_DESIGN.md) - Homarr integration design
+
+### Phase 4: Reverse Proxy Integration (Future)
+
+**Goal**: Clean URLs with Traefik reverse proxy
+
+**Status**: Design Complete (after Phase 3.5)
+
+**Deliverables**:
+- Traefik packaged as `halos-traefik-container`
+- Auto-configuration via Docker labels (Runtipi style)
+- HTTPS with self-signed or Let's Encrypt certificates
+- Pre-installed in HaLOS images
+
+**Key Features**:
+- Clean URLs instead of random ports (e.g., `halos.local/signalk` vs `:3000`)
+- Optional integration - apps work with direct ports as fallback
+- User choice per app (Traefik route, direct port, or both)
+- Automatic HTTPS certificate management
+- Integration with Homarr (dashboard shows proxy URLs)
+- Traefik labels auto-generated in app packages
+
+**Documentation**:
+- [docs/TRAEFIK_INTEGRATION_DESIGN.md](docs/TRAEFIK_INTEGRATION_DESIGN.md) - Traefik integration design
+
+**Open Questions** (TBD during implementation):
+- URL scheme: Path-based (`halos.local/app`) vs subdomain-based (`app.halos.local`)?
+- Default HTTPS always or HTTP by default?
+
+### Phase 5: Upstream & Community (Long-term)
 
 **Goal**: Upstream contributions and community maintenance
 
@@ -291,12 +341,22 @@ Halos is transitioning to a unified Cockpit-based administration experience. Thi
 2026 Q1: Phase 2 - Container Configuration
 └─ cockpit-container-config module
 
-2026 Q2+: Phase 3 - Expansion & Polish
+2026 Q2: Phase 3 - Expansion & Polish
 ├─ Expanded app catalog (20+ apps)
 ├─ Additional stores
 └─ WiFi configuration
 
-2026+: Phase 4 - Upstream & Community
+2026 Q3: Phase 3.5 - Dashboard Integration
+├─ Homarr dashboard landing page
+├─ Auto-discovery adapter (Rust)
+└─ Default page at http://halos.local/
+
+2026 Q4: Phase 4 - Reverse Proxy
+├─ Traefik integration
+├─ Clean URLs (no ports)
+└─ HTTPS with Let's Encrypt
+
+2027+: Phase 5 - Upstream & Community
 └─ Debian/Ubuntu submission
 ```
 
@@ -309,15 +369,15 @@ Halos is transitioning to a unified Cockpit-based administration experience. Thi
 - **Contribute**: See individual component repositories for contribution guidelines
 - **Test**: Try Phase 1 features as they become available and report issues
 
-### Migration from Runtipi
+### Runtipi Replacement
 
-Phase 1 and Phase 2 will establish the foundation for a smooth migration:
-- Container apps will be available via cockpit-apt (Phase 1)
-- Configuration UI will match/exceed Runtipi's ease of use (Phase 2)
-- Runtipi will remain available during transition
-- Clear migration path and documentation will be provided
+Runtipi will be replaced (not migrated) once equivalent functionality is available:
+- **Phase 1-2**: Container apps via cockpit-apt + configuration UI
+- **Phase 3.5**: Homarr replaces Runtipi dashboard
+- **Phase 4**: Traefik replaces Runtipi's reverse proxy
+- Runtipi removed from HaLOS images after Phase 4 complete
 
-No action required from users until migration tools are ready.
+Users install HaLOS during transition will have Runtipi available until the new stack is ready.
 
 ## Development
 
