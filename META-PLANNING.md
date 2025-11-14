@@ -1,13 +1,15 @@
 # HaLOS Cockpit Development - Coordination Document
 
-**Status**: Active
-**Last Updated**: 2025-11-11
+**Document Purpose**: High-level planning document for the multi-component HaLOS Cockpit development effort. Defines architecture decisions, component relationships, and implementation phases. This document should guide detailed component planning but does NOT track implementation progress.
+
+**Last Updated**: 2025-11-14
 
 ## Purpose
 
-This document coordinates the multi-component HaLOS Cockpit development effort. It provides high-level architecture decisions, phase tracking, and pointers to detailed component designs.
+This document coordinates the multi-component HaLOS Cockpit development effort. It provides high-level architecture decisions, phase planning, and pointers to detailed component designs.
 
 **For implementation details**, see component-specific DESIGN.md files linked below.
+**For progress tracking**, see [GitHub Issues](https://github.com/hatlabs/halos-distro/issues) and [Project Board](https://github.com/orgs/hatlabs/projects/1).
 
 ## Vision: Browser-Based, Unified Administration
 
@@ -20,23 +22,6 @@ This document coordinates the multi-component HaLOS Cockpit development effort. 
 - **Standard Debian tools**: Built on APT, systemd, NetworkManager (not custom solutions)
 - **Upstream friendly**: Designed for potential inclusion in Debian/Ubuntu
 - **Extensible architecture**: Multiple stores can coexist (marine, dev, home automation)
-
-## Current State (November 2025)
-
-**Complete**:
-- ✅ `cockpit-apt` module v0.1.0 - Full APT package manager for Cockpit
-- ✅ Design documentation extracted to component repos
-- ✅ GitHub project tracking set up ([Project #1](https://github.com/orgs/hatlabs/projects/1))
-
-**In Progress** (Phase 1):
-- 🔄 Container packaging tooling
-- 🔄 Marine container store
-- 🔄 cockpit-apt store filtering UI
-
-**Planned**:
-- Phase 2: Container configuration UI
-- Phase 3: Expanded app catalog, WiFi configuration
-- Phase 4: Upstream contributions
 
 ## Architecture Overview
 
@@ -111,15 +96,13 @@ halos-distro/                      # Workspace coordinator (this repo)
 
 ## Implementation Phases
 
-### Phase 1: Container Store Foundation ⏳
+### Phase 1: Container Store Foundation
 
 **Goal**: Establish container app packaging and store infrastructure
 
-**Status**: [In Progress - Track on GitHub](https://github.com/hatlabs/halos-distro/issues/12)
-
 **Deliverables**:
 - Tool to generate container packages from app definitions
-- 3-5 working marine container apps
+- Working marine container apps (Signal K, OpenCPN, AvNav, Grafana, InfluxDB)
 - Store filter working in cockpit-apt UI
 - Users can install/remove container apps via cockpit-apt
 
@@ -129,13 +112,9 @@ halos-distro/                      # Workspace coordinator (this repo)
 - Installs Signal K or OpenCPN successfully
 - systemd service starts, container runs
 
-**Timeline**: 2025 Q4
-
-### Phase 2: Container Configuration 📅
+### Phase 2: Container Configuration
 
 **Goal**: Web UI for configuring installed container apps
-
-**Status**: Planning (after Phase 1)
 
 **Key Features**:
 - List view of installed apps with status
@@ -143,13 +122,9 @@ halos-distro/                      # Workspace coordinator (this repo)
 - Service control (start/stop/restart)
 - Log viewer (journalctl integration)
 
-**Timeline**: 2026 Q1
-
-### Phase 3: Expansion & Polish 🔮
+### Phase 3: Expansion & Polish
 
 **Goal**: More apps, additional stores, WiFi configuration
-
-**Status**: Concept (after Phase 2)
 
 **Key Features**:
 - 20+ marine apps
@@ -157,13 +132,9 @@ halos-distro/                      # Workspace coordinator (this repo)
 - WiFi configuration in Cockpit
 - Converter tools (import from other app stores)
 
-**Timeline**: 2026 Q2+
-
-### Phase 3.5: Dashboard Integration 🎨
+### Phase 3.5: Dashboard Integration
 
 **Goal**: Unified landing page with Homarr dashboard
-
-**Status**: Design Complete (after Phase 3)
 
 **Components**:
 - homarr-container - Dashboard application
@@ -185,13 +156,9 @@ halos-distro/                      # Workspace coordinator (this repo)
 **Documentation**:
 - [docs/HOMARR_INTEGRATION_DESIGN.md](docs/HOMARR_INTEGRATION_DESIGN.md) - Integration design
 
-**Timeline**: 2026 Q3
-
-### Phase 4: Reverse Proxy Integration 🔀
+### Phase 4: Reverse Proxy Integration
 
 **Goal**: Clean URLs with Traefik reverse proxy
-
-**Status**: Design Complete (after Phase 3.5)
 
 **Components**:
 - halos-traefik-container - Reverse proxy with auto-configuration
@@ -213,18 +180,14 @@ halos-distro/                      # Workspace coordinator (this repo)
 **Documentation**:
 - [docs/TRAEFIK_INTEGRATION_DESIGN.md](docs/TRAEFIK_INTEGRATION_DESIGN.md) - Integration design
 
-**Timeline**: 2026 Q4
-
-**Open Questions** (TBD during implementation):
+**Open Questions** (TBD during planning/implementation):
 - URL scheme: Path-based vs subdomain-based?
 - Traefik as required dependency?
 - Default HTTPS always or HTTP by default?
 
-### Phase 5: Upstream & Community 🌐
+### Phase 5: Upstream & Community
 
 **Goal**: Upstream contributions and community maintenance
-
-**Status**: Long-term vision (after Phase 4)
 
 **Key Features**:
 - Submit cockpit-apt to Debian/Ubuntu
@@ -232,44 +195,22 @@ halos-distro/                      # Workspace coordinator (this repo)
 - Community contribution workflows
 - Quality assurance and security review processes
 
-**Timeline**: 2027+
+## GitHub Tracking
 
-## Progress Tracking
+**Project Board**: [HaLOS Development](https://github.com/orgs/hatlabs/projects/1)
+**Milestones**: [View all milestones](https://github.com/hatlabs/halos-distro/milestones)
+**Issues**: [View open issues](https://github.com/hatlabs/halos-distro/issues)
 
-### GitHub Resources
-
-- **Project Board**: [HaLOS Development](https://github.com/orgs/hatlabs/projects/1)
-- **Milestones**: [View all milestones](https://github.com/hatlabs/halos-distro/milestones)
-- **Issues**: [View open issues](https://github.com/hatlabs/halos-distro/issues)
-
-### Labels
+### Issue Labels
 
 - **Component**: `component:apt`, `component:containers`, `component:tooling`, `component:config`
 - **Phase**: `phase:1`, `phase:2`, `phase:3`
 - **Priority**: `priority:high`, `priority:low`
 - **Type**: `type:design`, `type:implementation`, `type:documentation`
 
-### Current Sprint (Phase 1)
+## Component Planning Process
 
-**Active Issues**:
-- [#13](https://github.com/hatlabs/halos-distro/issues/13) - cockpit-apt store filtering
-- [#14](https://github.com/hatlabs/halos-distro/issues/14) - halos-marine-containers
-- [#15](https://github.com/hatlabs/halos-distro/issues/15) - container-packaging-tools
-
-**Recommended Implementation Order**:
-1. **container-packaging-tools** - Build the tooling first
-2. **halos-marine-containers** - Create store and 3-5 apps
-3. **cockpit-apt** - Add UI filtering features
-
-## Next Steps
-
-### Immediate (This Week)
-
-- [x] Extract design docs to component repos
-- [x] Set up GitHub project and tracking
-- [x] Update README with roadmap
-
-### Phase 1 Kickoff
+### For Each New Component
 
 Per [PROJECT_PLANNING_GUIDE.md](PROJECT_PLANNING_GUIDE.md), each component should:
 
@@ -280,8 +221,6 @@ Per [PROJECT_PLANNING_GUIDE.md](PROJECT_PLANNING_GUIDE.md), each component shoul
 5. Review and refine
 6. Create detailed GitHub issues from tasks
 7. Begin implementation
-
-**Start with**: container-packaging-tools (enables everything else)
 
 ## Reference Documents
 
@@ -307,6 +246,7 @@ Per [PROJECT_PLANNING_GUIDE.md](PROJECT_PLANNING_GUIDE.md), each component shoul
 
 ## Change Log
 
+- **2025-11-14**: Removed progress tracking, made document purely planning-focused
 - **2025-11-11**: Simplified to coordination level, extracted details to component designs
 - **2025-11-10**: Created initial META-PLANNING.md with full architecture details
 - **2025-11-09**: Resolved architecture decisions (paths, tags, packages, workflow)
