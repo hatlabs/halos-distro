@@ -1,10 +1,24 @@
-# HaLOS Workspace
+# HaLOS Workspace - Agentic Coding Hub
 
-**Document Purpose**: Instructions for AI assistants working with the HaLOS workspace. Defines repository structure, architecture layers, and development workflows.
+**LAST MODIFIED**: 2025-11-16
+
+**Document Purpose**: Central workspace for agentic coding with Claude Code and other AI assistants. This workspace provides full context across all HaLOS repositories for optimal AI-assisted development.
+
+## 🎯 For Agentic Coding: Use This Workspace
+
+**IMPORTANT**: When using Claude Code or other AI assistants, always work from this workspace repository, not individual sub-repos. The full context enables better code understanding and implementation quality.
+
+**Development Workflows**: See `docs/` folder:
+- `docs/HUMAN_DEVELOPMENT_GUIDANCE.md` - Quick start for human developers
+- `docs/IMPLEMENTATION_CHECKLIST.md` - Implementation checklist
+- `docs/DEVELOPMENT_WORKFLOW.md` - Detailed Claude Code workflows
+- `docs/PROJECT_PLANNING_GUIDE.md` - Project planning process
+
+## About HaLOS
 
 Halos (Hat Labs Operating System) - custom Raspberry Pi OS distribution with web management.
 
-This workspace manages multiple independent repositories for convenience. Each repository must work independently and can have no directory-level cross-dependencies.
+This workspace manages multiple independent repositories. While each repository works independently from a code perspective, agentic coding requires the full workspace context.
 
 ## Git Workflow Policy
 
@@ -24,14 +38,6 @@ halos-distro/
 ```
 
 **Each repository has its own AGENTS.md** - read the appropriate one for detailed context.
-
-### Phase 1 Components (Cockpit-based Management)
-
-These three repositories implement the new Cockpit-based container management system:
-
-- **cockpit-apt**: APT package manager with container store filtering
-- **container-packaging-tools**: Generates .deb packages from container definitions
-- **halos-marine-containers**: Marine app definitions + store package
 
 ## Quick Start
 
