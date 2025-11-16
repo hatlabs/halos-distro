@@ -126,7 +126,7 @@ def test_user_authentication():
 
     # Test token validation
     token = get_token("user@example.com", "password123")
-    assert validate_token(token) == True
+    assert validate_token(token)
 ```
 
 ### Step 2: Verify Tests Fail
