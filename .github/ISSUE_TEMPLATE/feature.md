@@ -20,7 +20,7 @@ assignees: ''
 
 ## Implementation Workflow
 
-**IMPORTANT**: Follow the [DEVELOPMENT_WORKFLOW.md](/DEVELOPMENT_WORKFLOW.md) guide. Do NOT skip steps.
+**IMPORTANT**: Follow the [DEVELOPMENT_WORKFLOW.md](/docs/DEVELOPMENT_WORKFLOW.md) guide. Do NOT skip steps.
 
 ### Phase 1: Explore & Plan ⚠️ NO CODING YET!
 1. **Explore**: Read all relevant files WITHOUT writing code. Use `Task tool with subagent_type=Explore` for complex exploration
