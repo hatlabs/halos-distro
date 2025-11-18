@@ -209,6 +209,7 @@ Halos is transitioning to a unified Cockpit-based administration experience. Thi
 
 **Documentation**:
 - [META-PLANNING.md](META-PLANNING.md) - Overall project planning
+- [docs/CATEGORIZATION_STRATEGY.md](docs/CATEGORIZATION_STRATEGY.md) - Tag-based categorization approach
 - [halos-marine-containers/docs/DESIGN.md](halos-marine-containers/docs/DESIGN.md) - App and store definition format
 - [container-packaging-tools/docs/DESIGN.md](container-packaging-tools/docs/DESIGN.md) - Packaging tool design
 - [cockpit-apt/docs/CONTAINER_STORE_DESIGN.md](cockpit-apt/docs/CONTAINER_STORE_DESIGN.md) - UI implementation
