@@ -152,7 +152,7 @@ There is one more crucial step: code review! Always have Claude review their own
 
 ## Plan and Models to Use
 
-The increased productivity, unfortunately, comes at a cost. The regular USD 20 /month Claude Pro plan is only good for maybe two hours of daily development work, and it will also consume the weekly quota in no time. The USD 100 /month Claude Max plan is sufficient for full-time development work, as long as you don't try to run multiple sessions in parallel.
+The increased productivity, unfortunately, comes at a cost. The regular USD 20 /month Claude Pro plan is good for maybe one or two hours of daily development work, and it will also consume the weekly quota in no time. It is still usable for occasional use, though. The USD 100 /month Claude Max plan is sufficient for full-time development work, as long as you don't try to run multiple sessions in parallel. It is also possible to pay for extra usage if needed, so if you only need a little more than what Claude Pro offers, you don't need to jump to Max immediately.
 
 The output quality also depends on the LLM model used. Anthropic's Claude Sonnet 4.5 is a capable model. I have not found much improvement when using their best model, Claude Opus 4.1. Opus is also five times as expensive.
 
