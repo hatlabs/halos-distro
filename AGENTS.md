@@ -9,7 +9,7 @@
 **IMPORTANT**: When using Claude Code or other AI assistants, always work from this workspace repository, not individual sub-repos. The full context enables better code understanding and implementation quality.
 
 **Development Workflows**: See `docs/` folder:
-- `docs/HUMAN_DEVELOPMENT_GUIDANCE.md` - Quick start for human developers
+- `docs/LIFE_WITH_CLAUDE.md` - Quick start for human developers
 - `docs/IMPLEMENTATION_CHECKLIST.md` - Implementation checklist
 - `docs/DEVELOPMENT_WORKFLOW.md` - Detailed Claude Code workflows
 - `docs/PROJECT_PLANNING_GUIDE.md` - Project planning process

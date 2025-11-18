@@ -1,7 +1,5 @@
 # Claude Code Project Planning Guide
 
-**Last modified:** 2025-11-16
-
 This document describes the project planning and development workflow for Claude Code-driven projects backed by GitHub repositories.
 
 ## Philosophy
@@ -20,8 +18,6 @@ This document describes the project planning and development workflow for Claude
   - Branch targeting criteria: `main` (default branch)
   - Require a pull request before merging
   - Block force pushes
-  - Automatically request Copilot code review
-  - Copilot sub-option: Review new pushes
 
 
 ## Project Structure
@@ -107,8 +103,6 @@ After reviewing and refining TASKS.md:
 
 **Claude Code creates:** GitHub issues for each task
 
-**IMPORTANT:** Use the issue templates in `.github/ISSUE_TEMPLATE/` when available. These templates ensure proper workflow guidance.
-
 **Issue format (if not using template):**
 ```
 Title: [Brief, clear description]
@@ -183,7 +177,8 @@ EOF
   --label "type:feature"
 ```
 
-**Important:** Each repository should have `docs/IMPLEMENTATION_CHECKLIST.md` and all issues must mandate following it during implementation.
+**Important:** Each repository should have `docs/IMPLEMENTATION_CHECKLIST.md` and
+it should be inserted in the issue body of every new issue.
 
 **After issue creation:** Delete TASKS.md as it has served its purpose (or archive outside repository if historical reference is needed)
 
@@ -232,10 +227,9 @@ Claude Code: Closes issue with summary of changes
 
 ### Iteration Patterns
 
-**All development iteration happens through direct conversation**, not through GitHub comments:
+**All development iteration happens through direct conversation**:
 
 - Quick fixes: Just tell Claude Code what to change
-- Code review feedback: Discuss directly, no need to document in issue
 - Design discussions: Talk it through, update docs/ files if needed
 
 ### Ad-hoc Work
