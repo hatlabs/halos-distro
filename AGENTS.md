@@ -28,13 +28,13 @@ This workspace manages multiple independent repositories. While each repository 
 
 ```
 halos-distro/
-├── halos-pi-gen/                  # Image builder (submodule)
-├── runtipi-marine-app-store/      # Marine app store (submodule)
-├── runtipi-docker-service/        # Runtipi Debian package
-├── apt.hatlabs.fi/                # Custom APT repo (submodule)
-├── cockpit-apt/                   # Cockpit APT package manager (Phase 1)
-├── container-packaging-tools/     # Container package generator (Phase 1)
-└── halos-marine-containers/       # Marine app definitions + store (Phase 1)
+├── halos-pi-gen/                  # Image builder
+├── runtipi-marine-app-store/      # Marine app store
+├── apt.hatlabs.fi/                # Custom APT repo
+├── cockpit-apt/                   # Cockpit APT package manager
+├── cockpit-branding-halos/        # Cockpit HaLOS branding package
+├── container-packaging-tools/     # Container package generator
+└── halos-marine-containers/       # Marine app definitions + store
 ```
 
 **Each repository has its own AGENTS.md** - read the appropriate one for detailed context.
