@@ -24,6 +24,8 @@ This workspace manages multiple independent repositories. While each repository 
 
 **MANDATORY**: PRs must ALWAYS have all checks passing before merging. No matter what.
 
+**PR Reviews**: When reviewing pull requests, always post review comments directly on the PR itself using `gh pr comment`. This ensures feedback is visible to all stakeholders and preserved in the project history.
+
 ## Structure
 
 ```

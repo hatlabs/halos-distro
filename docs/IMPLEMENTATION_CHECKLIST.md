@@ -63,35 +63,6 @@
 
 ---
 
-## 📝 Quick Commands
-
-### Backend (Python)
-```bash
-./run test -k feature     # Run specific tests
-./run lint               # Check code style
-./run typecheck          # Type checking
-./run format             # Format code
-```
-
-### Frontend (TypeScript)
-```bash
-npm run test             # Run tests
-npm run lint             # Check code style
-npm run typecheck        # Type checking
-npm run build            # Build frontend
-```
-
-### Git Workflow
-```bash
-git checkout -b feat/name     # Create feature branch
-git add .                     # Stage changes
-git commit -m "type: msg"     # Commit with conventional format
-git push -u origin feat/name  # Push branch
-gh pr create                  # Create pull request
-```
-
----
-
 ## 🎯 Success Criteria
 
 A successful implementation has:
