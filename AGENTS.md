@@ -37,7 +37,8 @@ halos-distro/
 ├── cockpit-branding-halos/        # Cockpit HaLOS branding package
 ├── halos-metapackages/            # HaLOS metapackages (halos, halos-marine)
 ├── container-packaging-tools/     # Container package generator
-└── halos-marine-containers/       # Marine app definitions + store
+├── halos-marine-containers/       # Marine app definitions + store
+└── halos-imported-containers/     # Auto-imported apps from CasaOS, Runtipi, etc.
 ```
 
 **Each repository has its own AGENTS.md** - read the appropriate one for detailed context.
