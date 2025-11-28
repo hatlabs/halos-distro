@@ -35,6 +35,7 @@ halos-distro/
 ├── apt.hatlabs.fi/                # Custom APT repo
 ├── cockpit-apt/                   # Cockpit APT package manager
 ├── cockpit-branding-halos/        # Cockpit HaLOS branding package
+├── cockpit-networkmanager-halos/  # Cockpit NetworkManager with WiFi features
 ├── halos-metapackages/            # HaLOS metapackages (halos, halos-marine)
 ├── container-packaging-tools/     # Container package generator
 ├── halos-marine-containers/       # Marine app definitions + store
