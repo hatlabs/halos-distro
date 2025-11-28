@@ -39,6 +39,7 @@ declare -A REPOS=(
   ["opencpn-docker"]="git@github.com:hatlabs/opencpn-docker.git main"
   ["cockpit-apt"]="git@github.com:hatlabs/cockpit-apt.git main"
   ["cockpit-branding-halos"]="git@github.com:hatlabs/cockpit-branding-halos.git main"
+  ["cockpit-networkmanager-halos"]="git@github.com:hatlabs/cockpit-networkmanager-halos.git main"
   ["halos-metapackages"]="git@github.com:hatlabs/halos-metapackages.git main"
 )
 
