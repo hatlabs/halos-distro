@@ -41,6 +41,7 @@ declare -A REPOS=(
   ["cockpit-branding-halos"]="git@github.com:hatlabs/cockpit-branding-halos.git main"
   ["cockpit-networkmanager-halos"]="git@github.com:hatlabs/cockpit-networkmanager-halos.git main"
   ["halos-metapackages"]="git@github.com:hatlabs/halos-metapackages.git main"
+  ["halos-core-containers"]="git@github.com:hatlabs/halos-core-containers.git main"
 )
 
 ################################################################################

@@ -39,6 +39,7 @@ halos-distro/
 ├── halos-metapackages/            # HaLOS metapackages (halos, halos-marine)
 ├── container-packaging-tools/     # Container package generator
 ├── halos-marine-containers/       # Marine app definitions + store
+├── halos-core-containers/         # Core app definitions (Homarr dashboard)
 └── halos-imported-containers/     # Auto-imported apps from CasaOS, Runtipi, etc.
 ```
 
