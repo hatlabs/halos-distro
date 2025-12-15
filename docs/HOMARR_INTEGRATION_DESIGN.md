@@ -2,7 +2,7 @@
 
 **Status**: Design (Phase 3.5)
 **Date**: 2025-11-11
-**Last Updated**: 2025-11-11
+**Last Updated**: 2025-12-10
 
 ## Overview
 
@@ -38,17 +38,20 @@ Homarr provides a unified dashboard landing page for accessing all installed con
         ┌──────────────────────────────┐
         │   homarr-container (port 80)  │
         │   Dashboard Web UI            │
+        │   + HaLOS theming (branding)  │
         └──────────┬───────────────────┘
                    │ Homarr API
                    ▼
       ┌────────────────────────────────────┐
       │  homarr-container-adapter (native) │
       │  Rust service, systemd timer       │
+      │  + First-boot setup                │
       └─────┬──────────────────────────────┘
             │
             ├─ Scans Docker containers ────►┐
             ├─ Reads container labels  ◄────┤
-            └─ Updates Homarr config ────────┘
+            ├─ Updates Homarr config ────────┘
+            └─ First-boot: creates default board, user, theme
                          │
                          ▼
                 ┌────────────────┐
@@ -74,6 +77,15 @@ Homarr provides a unified dashboard landing page for accessing all installed con
 - Service: `homarr-container-adapter.service` (oneshot) + `homarr-container-adapter.timer`
 - Config: `/etc/homarr-container-adapter/config.toml`
 - State: `/var/lib/homarr-container-adapter/state.json` (tracks removed apps)
+
+**3. halos-homarr-branding**
+- Type: Native Debian package (static assets + config)
+- Naming: `halos-homarr-branding_<version>_all.deb`
+- Depends: `homarr-container`
+- Contents:
+  - `/etc/halos-homarr-branding/branding.toml` - Theme colors, default credentials
+  - `/usr/share/halos-homarr-branding/` - Static assets (logos, icons)
+- Purpose: Separates HaLOS customization from upstream Homarr container
 
 ## Auto-Discovery Mechanism
 
@@ -117,6 +129,7 @@ services:
 ```json
 {
   "version": "1.0",
+  "first_boot_completed": true,
   "removed_apps": [
     "signalk-server-container",
     "another-app-container"
@@ -183,33 +196,267 @@ async fn sync_apps() -> Result<()> {
 }
 ```
 
-## Homarr API Integration
+## First-Boot Setup and Branding
 
-The adapter communicates with Homarr via its REST API:
+### Overview
 
-**Add/Update App**:
-```http
-POST /api/modules/ping
-Content-Type: application/json
+The adapter handles initial Homarr configuration on first boot, providing a ready-to-use dashboard experience. This is a **hybrid approach**:
 
-{
-  "name": "Signal K Server",
-  "url": "http://halos.local:3000",
-  "icon": "/icons/signalk.png",
-  "category": "Marine",
-  "description": "Marine data processing and routing"
+- **Static assets** (logos, theme config) come from `halos-homarr-branding` package
+- **Runtime setup** (creating board, user, applying theme) done by adapter via Homarr API
+
+### First-Boot Detection
+
+The adapter detects first boot by checking:
+1. Homarr database exists but has no boards configured
+2. State file indicates `first_boot_completed: false`
+
+```rust
+async fn is_first_boot() -> bool {
+    // Check adapter state
+    let state = State::load().unwrap_or_default();
+    if state.first_boot_completed {
+        return false;
+    }
+
+    // Check Homarr has no boards
+    let homarr = HomarrClient::new();
+    let boards = homarr.list_boards().await.unwrap_or_default();
+    boards.is_empty()
 }
 ```
 
-**List Apps** (for state reconciliation):
-```http
-GET /api/modules/ping
+### First-Boot Workflow
+
+On first boot, the adapter performs these steps via Homarr API:
+
+1. **Create default admin user**
+   - Username: `admin`
+   - Password: `halos` (from branding config)
+   - User can change password after first login
+
+2. **Apply HaLOS theming**
+   - Set dark mode as default
+   - Apply HaLOS color scheme (from branding config)
+   - Set custom logo if supported
+
+3. **Create default board**
+   - Board name: "HaLOS Dashboard"
+   - Add Cockpit tile (always present)
+   - Add system status widgets
+   - Leave space for auto-discovered apps
+
+4. **Mark first-boot complete**
+   - Update state file: `first_boot_completed: true`
+   - Subsequent runs skip this workflow
+
+### Branding Configuration
+
+The `halos-homarr-branding` package provides `/etc/halos-homarr-branding/branding.toml`:
+
+```toml
+[identity]
+product_name = "HaLOS"
+logo_path = "/usr/share/halos-homarr-branding/logo.svg"
+
+[theme]
+# Dark mode by default for marine/industrial use
+default_mode = "dark"
+# HaLOS brand colors
+primary_color = "#1a73e8"
+accent_color = "#4285f4"
+
+[credentials]
+# Default admin credentials (user should change on first login)
+admin_username = "admin"
+admin_password = "halos"
+
+[default_board]
+name = "HaLOS Dashboard"
+# Static tiles always present
+[[default_board.tiles]]
+name = "Cockpit"
+url = "https://halos.local:9090"
+icon = "cockpit"
+category = "System"
+description = "System management console"
 ```
 
-**Remove App** (manual user action tracked):
-```http
-DELETE /api/modules/ping/{id}
+### Adapter Reads Branding Config
+
+The adapter reads branding configuration at startup:
+
+```rust
+fn load_branding_config() -> BrandingConfig {
+    let path = "/etc/halos-homarr-branding/branding.toml";
+    if Path::new(path).exists() {
+        toml::from_str(&fs::read_to_string(path).unwrap()).unwrap()
+    } else {
+        // Fallback to sensible defaults if branding package not installed
+        BrandingConfig::default()
+    }
+}
 ```
+
+### Upgrade Handling
+
+On upgrades (not first boot):
+- **Preserve user customizations** - Never overwrite existing boards/settings
+- **Add missing default tiles** - If Cockpit tile was removed, don't re-add
+- **Theme updates** - Only apply if user hasn't customized theme
+
+## Homarr API Integration
+
+The adapter communicates with Homarr via its tRPC API. All endpoints use JSON with a `{"json": {...}}` wrapper.
+
+### Authentication
+
+**Session-based authentication is required** for most operations. API keys work for read operations but not for board/user mutations.
+
+```rust
+// Login flow (simplified)
+async fn login(username: &str, password: &str) -> Result<SessionCookies> {
+    // 1. Get CSRF token
+    let csrf = client.get("/api/auth/csrf").send().await?.json::<CsrfResponse>()?.csrf_token;
+
+    // 2. Login via credentials callback
+    let response = client.post("/api/auth/callback/credentials")
+        .form(&[
+            ("csrfToken", csrf),
+            ("name", username),
+            ("password", password),
+        ])
+        .send().await?;
+
+    // 3. Extract session cookie from response
+    Ok(extract_session_cookies(response))
+}
+```
+
+### Onboarding API (First-Boot Setup)
+
+The adapter must complete onboarding before the dashboard is usable:
+
+| Step | Endpoint | Input |
+|------|----------|-------|
+| Check current step | `GET /api/trpc/onboard.currentStep` | - |
+| Advance step | `POST /api/trpc/onboard.nextStep` | `{"json":{}}` |
+| Create admin user | `POST /api/trpc/user.initUser` | `{"json":{"username":"admin","password":"...","confirmPassword":"..."}}` |
+| Configure settings | `POST /api/trpc/serverSettings.initSettings` | See below |
+
+**Settings init payload:**
+```json
+{
+  "json": {
+    "analytics": {
+      "enableGeneral": false,
+      "enableWidgetData": false,
+      "enableIntegrationData": false,
+      "enableUserData": false
+    },
+    "crawlingAndIndexing": {
+      "noIndex": true,
+      "noFollow": true,
+      "noTranslate": true,
+      "noSiteLinksSearchBox": true
+    }
+  }
+}
+```
+
+### Board Management API
+
+**Create Board:**
+```
+POST /api/trpc/board.createBoard
+{"json": {"name": "halos-dashboard", "columnCount": 10, "isPublic": true}}
+→ Returns: {"boardId": "..."}
+```
+
+**Get Board by Name:**
+```
+GET /api/trpc/board.getBoardByName?input={"json":{"name":"halos-dashboard"}}
+→ Returns: Board with sections, items, layouts
+```
+
+**Save Board Content:**
+```
+POST /api/trpc/board.saveBoard
+{"json": {
+  "id": "<board-id>",
+  "sections": [...],
+  "items": [...],
+  "integrations": []
+}}
+```
+
+**Set Home Board:**
+```
+POST /api/trpc/board.setHomeBoard
+{"json": {"id": "<board-id>"}}
+```
+
+### App Management API
+
+**Create App:**
+```
+POST /api/trpc/app.create
+{"json": {
+  "name": "Cockpit",
+  "description": "System management console",
+  "iconUrl": "https://example.com/icon.svg",
+  "href": "https://halos.local:9090",
+  "pingUrl": null
+}}
+→ Returns: {"appId": "...", "id": "...", ...}
+```
+
+**Get All Apps:**
+```
+GET /api/trpc/app.getAll
+→ Returns: Array of apps
+```
+
+### Board Item Schema
+
+When adding an app to a board via `board.saveBoard`, items must include:
+
+```json
+{
+  "id": "unique-item-id",
+  "kind": "app",
+  "appId": "<app-id-from-create>",
+  "options": {},
+  "layouts": [{
+    "layoutId": "<board-layout-id>",
+    "sectionId": "<board-section-id>",
+    "width": 2,
+    "height": 2,
+    "xOffset": 0,
+    "yOffset": 0
+  }],
+  "integrationIds": [],
+  "advancedOptions": {
+    "customCssClasses": []
+  }
+}
+```
+
+### User Preferences API
+
+**Change Color Scheme (Dark/Light):**
+```
+POST /api/trpc/user.changeColorScheme
+{"json": {"colorScheme": "dark"}}
+```
+
+### Password Requirements
+
+Passwords must meet security requirements:
+- Minimum length (typically 8+ characters)
+- Mix of uppercase, lowercase, numbers, special characters
+
+Example valid password: `HalosAdmin123@`
 
 ## User Customization
 
@@ -276,11 +523,12 @@ Homarr runs on port 80, making it the default landing page:
 
 ### Pre-Installation in HaLOS Images
 
-Both packages pre-installed in HaLOS image builds:
+All three packages pre-installed in HaLOS image builds:
 - `homarr-container` - Dashboard application
-- `homarr-container-adapter` - Auto-discovery service
+- `homarr-container-adapter` - Auto-discovery service + first-boot setup
+- `halos-homarr-branding` - HaLOS theming and default configuration
 
-**Rationale**: Provides immediate, cohesive user experience on first boot.
+**Rationale**: Provides immediate, cohesive user experience on first boot with HaLOS branding.
 
 ### Store Package Suggestions
 
@@ -299,9 +547,10 @@ Optional meta-package for manual installations:
 
 ```
 Package: halos-dashboard
-Depends: homarr-container, homarr-container-adapter
+Depends: homarr-container, homarr-container-adapter, halos-homarr-branding
 Description: HaLOS unified dashboard
- Installs Homarr dashboard and auto-discovery adapter
+ Installs Homarr dashboard with HaLOS branding, auto-discovery,
+ and first-boot configuration
 ```
 
 ## Container App Label Requirements

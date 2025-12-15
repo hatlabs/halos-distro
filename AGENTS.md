@@ -1,6 +1,6 @@
 # HaLOS Workspace - Agentic Coding Hub
 
-**LAST MODIFIED**: 2025-11-16
+**LAST MODIFIED**: 2025-12-10
 
 **Document Purpose**: Central workspace for agentic coding with Claude Code and other AI assistants. This workspace provides full context across all HaLOS repositories for optimal AI-assisted development.
 
@@ -36,6 +36,8 @@ halos-distro/
 ├── cockpit-apt/                   # Cockpit APT package manager
 ├── cockpit-branding-halos/        # Cockpit HaLOS branding package
 ├── cockpit-networkmanager-halos/  # Cockpit NetworkManager with WiFi features
+├── halos-homarr-branding/         # Homarr HaLOS branding package
+├── homarr-container-adapter/      # Homarr first-boot setup and container discovery
 ├── halos-metapackages/            # HaLOS metapackages (halos, halos-marine)
 ├── container-packaging-tools/     # Container package generator
 ├── halos-marine-containers/       # Marine app definitions + store
@@ -62,7 +64,7 @@ cd halos-pi-gen
 ## Architecture Layers
 
 1. **Base OS**: Debian-based Raspberry Pi OS (arm64, trixie) built with pi-gen
-2. **Web Management** (all): Cockpit (9090) + Runtipi (80/443)
+2. **Web Management** (all): Cockpit (9090) + Homarr (7575) + Runtipi (80/443)
 3. **Hardware** (HALPI2 only): HALPI2 drivers, CAN, RS-485, I2C
 4. **Marine** (marine variants): Signal K (3000) → InfluxDB (8086) → Grafana (3001)
 
