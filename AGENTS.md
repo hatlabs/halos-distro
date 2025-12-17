@@ -36,7 +36,7 @@ halos-distro/
 ├── runtipi-marine-app-store/      # Marine app store
 ├── apt.hatlabs.fi/                # Custom APT repo
 ├── cockpit-apt/                   # Cockpit APT package manager
-├── cockpit-branding-halos/        # Cockpit HaLOS branding package
+├── halos-cockpit-branding/        # Cockpit HaLOS branding package
 ├── cockpit-networkmanager-halos/  # Cockpit NetworkManager with WiFi features
 ├── halos-homarr-branding/         # Homarr HaLOS branding package
 ├── homarr-container-adapter/      # Homarr first-boot setup and container discovery
