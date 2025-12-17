@@ -186,6 +186,30 @@ I have no strong opinion on MCPs at this point. I do have [ck-search](https://gi
 
 Hooks are user-defined shell commands that can be set to execute at specific points during Claude's operation. They can, for example, be used to validate commands before execution. I have not used them much, except for one thing: `git add -A` is something Claude likes to do, and it pulls in unwanted cruft. I asked Claude to create a hook to forbid that command, and voila! Problem solved.
 
+## Git Pre-commit Hooks with Lefthook
+
+To catch formatting and linting issues before they reach CI, HaLOS repositories use [lefthook](https://github.com/evilmartians/lefthook) for git pre-commit hooks. This ensures CI checks don't fail due to formatting issues that should have been caught locally.
+
+**One-time Setup:**
+
+```bash
+# Install lefthook
+brew install lefthook
+```
+
+**Per-repository Setup:**
+
+After cloning any HaLOS repository that has a `lefthook.yml`, install the hooks:
+
+```bash
+./run hooks-install
+```
+
+This enables pre-commit hooks that run format and lint checks matching what CI runs. To skip hooks when needed (e.g., WIP commits):
+
+```bash
+git commit --no-verify -m "WIP: message"
+```
 
 ## References
 
