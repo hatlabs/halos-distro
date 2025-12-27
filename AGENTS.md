@@ -13,6 +13,7 @@
 - `docs/IMPLEMENTATION_CHECKLIST.md` - Implementation checklist
 - `docs/DEVELOPMENT_WORKFLOW.md` - Detailed Claude Code workflows
 - `docs/PROJECT_PLANNING_GUIDE.md` - Project planning process
+- `docs/HOSTNAME_POLICY.md` - Policy on hard-coded hostname references
 
 ## About HaLOS
 
