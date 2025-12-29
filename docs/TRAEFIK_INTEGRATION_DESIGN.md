@@ -1,8 +1,8 @@
 # Traefik Reverse Proxy Integration - Design Document
 
-**Status**: Design (Phase 4)
+**Status**: Partially Implemented
 **Date**: 2025-11-11
-**Last Updated**: 2025-11-11
+**Last Updated**: 2025-12-29
 
 ## Overview
 
@@ -10,45 +10,56 @@ Traefik provides a reverse proxy for container applications, enabling unified UR
 
 ## Purpose
 
-- Provide clean URLs for accessing container apps
+- Provide clean subdomain-based URLs for accessing container apps
 - Eliminate need to remember port numbers
-- Enable HTTPS with automatic certificate management
-- Optional integration - apps can still use direct ports
-- User choice per application (proxy vs direct access)
+- Enable HTTPS with self-signed certificates
+- Centralize authentication via Authelia integration
+- Homarr dashboard links always point to subdomain URLs
 
 ## Design Principles
 
-1. **Optional**: Apps work without Traefik (direct port access as fallback)
-2. **Auto-Configuration**: Uses Docker labels (Runtipi style) for zero-config routing
-3. **Flexible**: User choice per app - Traefik route, direct port, or both
-4. **Secure**: Auto-detect self-signed vs Let's Encrypt based on domain configuration
-5. **Transparent**: Works seamlessly with Homarr dashboard integration
+1. **Subdomain-Only**: All HTTP apps are accessed exclusively via subdomain URLs (e.g., `grafana.halos.local`)
+2. **No Direct Port Fallback**: Apps should NOT expose ports unless absolutely necessary
+3. **Auto-Configuration**: Uses Docker labels for zero-config routing
+4. **Secure**: Self-signed certificates for HTTPS (Let's Encrypt deferred to future work)
+5. **Transparent**: Works seamlessly with Homarr dashboard and SSO integration
+
+### When Direct Port Exposure Is Allowed
+
+Apps may expose ports only when required:
+- **Non-HTTP protocols**: NMEA streams, CAN bus, WebSocket-only services
+- **Host networking requirement**: Apps that must use `network_mode: host`
+- **External tool compatibility**: When third-party tools require specific ports
 
 ## Architecture
 
 ### Components
 
 ```
-┌─────────────────────────────────────────────┐
-│           User's Browser                     │
-│   http://halos.local/signalk                │
-│   or http://halos.local:3000 (direct)       │
-└──────────────────┬──────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│              User's Browser                      │
+│   https://grafana.halos.local                   │
+│   https://signalk.halos.local                   │
+│   https://halos.local (Homarr dashboard)        │
+└──────────────────┬──────────────────────────────┘
                    │
                    ▼
-     ┌─────────────────────────────┐
-     │  halos-traefik-container    │
-     │  Reverse Proxy (80/443)     │
-     └──────┬──────────────────────┘
+     ┌─────────────────────────────────┐
+     │  traefik-container              │
+     │  Reverse Proxy (80/443)         │
+     │  + ForwardAuth → Authelia       │
+     └──────┬──────────────────────────┘
             │
-            ├─ Routes to signalk:3000
-            ├─ Routes to grafana:3001
-            └─ Routes to opencpn:8080
+            ├─ grafana.halos.local → grafana:3001
+            ├─ signalk.halos.local → host:3000 (host networking)
+            ├─ influxdb.halos.local → influxdb:8086
+            ├─ auth.halos.local → authelia:9091
+            └─ halos.local → homarr:7575
                       │
                       ▼
               ┌──────────────────┐
               │  Docker Network  │
-              │  Container Apps  │
+              │halos-proxy-network│
               └──────────────────┘
 ```
 
@@ -67,60 +78,58 @@ Traefik provides a reverse proxy for container applications, enabling unified UR
 
 ### Docker Label-Based Configuration
 
-Apps define Traefik routing via Docker labels in `docker-compose.yml` (Runtipi style):
+Apps define Traefik routing via Docker labels in `docker-compose.yml`:
 
 ```yaml
 services:
-  signalk:
-    image: signalk/signalk-server:latest
+  grafana:
+    image: grafana/grafana:latest
     labels:
-      # Traefik routing
+      # Traefik routing - subdomain based
       - "traefik.enable=true"
-      - "traefik.http.routers.signalk.rule=PathPrefix(`/signalk`)"
-      - "traefik.http.routers.signalk.entrypoints=web"
-      - "traefik.http.services.signalk.loadbalancer.server.port=3000"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.${HALOS_DOMAIN}`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.routers.grafana.middlewares=redirect-to-https@file"
+      - "traefik.http.routers.grafana-secure.rule=Host(`grafana.${HALOS_DOMAIN}`)"
+      - "traefik.http.routers.grafana-secure.entrypoints=websecure"
+      - "traefik.http.routers.grafana-secure.tls=true"
+      - "traefik.http.routers.grafana-secure.middlewares=authelia@file"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
-      # Optional: Strip path prefix
-      - "traefik.http.middlewares.signalk-stripprefix.stripprefix.prefixes=/signalk"
-      - "traefik.http.routers.signalk.middlewares=signalk-stripprefix"
+      # mDNS subdomain advertisement
+      - "halos.subdomain=grafana"
 
-      # Optional: HTTPS redirect
-      - "traefik.http.routers.signalk-secure.rule=PathPrefix(`/signalk`)"
-      - "traefik.http.routers.signalk-secure.entrypoints=websecure"
-      - "traefik.http.routers.signalk-secure.tls=true"
-
-    # Still expose port for direct access (optional)
-    ports:
-      - "3000:3000"
+    # NO port exposure - access via Traefik only
+    # ports:
+    #   - "3001:3000"  # REMOVED
 
     networks:
-      - traefik-net
+      - halos-proxy-network
 
 networks:
-  traefik-net:
+  halos-proxy-network:
     external: true
 ```
 
 ### URL Scheme
 
-**Status**: TBD (To Be Determined)
+**Decision**: Subdomain-based routing only.
 
-Options to be decided later:
-- **Path-based**: `halos.local/signalk`, `halos.local/grafana`
-- **Subdomain-based**: `signalk.halos.local`, `grafana.halos.local`
-- **Hybrid**: User preference or app-specific choice
+All apps are accessed via subdomains:
+- `halos.local` - Homarr dashboard (root domain)
+- `auth.halos.local` - Authelia login portal
+- `grafana.halos.local` - Grafana
+- `signalk.halos.local` - Signal K Server
+- `influxdb.halos.local` - InfluxDB
+- `cockpit.halos.local` - Cockpit web console
 
-**Current Approach**: Use path-based in examples, final decision during implementation.
+Path-based routing (e.g., `halos.local/grafana`) is NOT supported.
 
 ## HTTPS/TLS Configuration
 
-### Auto-Detection Strategy
+### Current Implementation
 
-Traefik automatically determines certificate strategy:
-
-1. **Check for domain configuration**: Look for `/etc/traefik/domain.txt`
-2. **If domain exists**: Use Let's Encrypt (ACME)
-3. **If no domain**: Use self-signed certificate
+Self-signed certificates are used for all HTTPS traffic. Let's Encrypt integration is deferred to future work.
 
 **Self-Signed Certificate**:
 ```yaml
@@ -131,18 +140,6 @@ tls:
       keyFile: /certs/halos.local.key
 ```
 
-**Let's Encrypt**:
-```yaml
-# traefik.yml
-certificatesResolvers:
-  letsencrypt:
-    acme:
-      email: admin@halos.local
-      storage: /certs/acme.json
-      httpChallenge:
-        entryPoint: web
-```
-
 ### Certificate Management
 
 **Self-Signed Generation** (on first boot):
@@ -150,56 +147,68 @@ certificatesResolvers:
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -keyout /certs/halos.local.key \
   -out /certs/halos.local.crt \
-  -subj "/CN=halos.local"
+  -subj "/CN=halos.local" \
+  -addext "subjectAltName=DNS:halos.local,DNS:*.halos.local"
 ```
 
-**Let's Encrypt Renewal**: Automatic via Traefik ACME
+The wildcard SAN (`*.halos.local`) enables the certificate to cover all subdomain URLs.
+
+### Future: Let's Encrypt Support
+
+Let's Encrypt integration remains a valid future enhancement for users with public domain names:
+- Requires public DNS and port 80/443 accessible from internet
+- Not applicable for `.local` mDNS domains
+- Implementation deferred until there's user demand
 
 ## Integration Points
 
 ### With Homarr Dashboard
 
-Homarr links updated to use Traefik routes:
+Homarr links always use subdomain URLs via the `homarr-container-adapter`:
 
-**Without Traefik** (Phase 3.5):
 ```yaml
 labels:
-  - "homarr.url=http://halos.local:3000"
+  - "homarr.enable=true"
+  - "homarr.name=Grafana"
+  - "homarr.url=https://grafana.${HALOS_DOMAIN}"
+  - "homarr.category=Monitoring"
 ```
 
-**With Traefik** (Phase 4):
-```yaml
-labels:
-  - "homarr.url=http://halos.local/signalk"  # Traefik route
-  - "homarr.url.direct=http://halos.local:3000"  # Fallback
-```
-
-Homarr dashboard shows both options if available.
+Direct port URLs are NOT shown in Homarr. Users access all apps through their subdomain URLs.
 
 ### With Container Apps
 
-**User Choice Per App**:
+**Standard Apps** (Traefik-only):
+```yaml
+# NO ports section - access via Traefik subdomain only
+labels:
+  - "traefik.enable=true"
+  - "traefik.http.routers.myapp.rule=Host(`myapp.${HALOS_DOMAIN}`)"
+  # ... Traefik configuration
+networks:
+  - halos-proxy-network
+```
 
-1. **Traefik Only**: Remove port mapping, access via proxy only
-   ```yaml
-   # No ports section, Traefik labels only
-   ```
+**Host Networking Apps** (e.g., Signal K):
+```yaml
+network_mode: host
+labels:
+  - "traefik.enable=true"
+  - "traefik.http.routers.signalk.rule=Host(`signalk.${HALOS_DOMAIN}`)"
+  - "traefik.http.services.signalk.loadbalancer.server.port=3000"
+  # Direct port access remains available as side effect of host networking
+```
 
-2. **Direct Port Only**: No Traefik labels
-   ```yaml
-   ports:
-     - "3000:3000"
-   # No traefik.enable label
-   ```
-
-3. **Both** (Recommended): Port + Traefik route
-   ```yaml
-   ports:
-     - "3000:3000"
-   labels:
-     - "traefik.enable=true"
-     # ... Traefik configuration
-   ```
+**Apps Requiring Direct Ports** (non-HTTP protocols):
+```yaml
+ports:
+  - "34567:34567"  # NMEA TCP stream - required for external tools
+labels:
+  - "traefik.enable=true"
+  # HTTP UI still goes through Traefik
+networks:
+  - halos-proxy-network
+```
 
 ## Traefik Configuration
 
@@ -384,30 +393,40 @@ Options:
 
 ## Port Allocation Strategy
 
-### Recommended Approach: Both Traefik + Direct Port
+### Default: Traefik-Only (No Direct Ports)
 
-Apps expose both routes:
-- **Traefik route**: Clean URL (e.g., `halos.local/signalk`)
-- **Direct port**: Fallback/power users (e.g., `halos.local:3000`)
+Apps are accessed exclusively via Traefik subdomain URLs. Direct port exposure is removed.
 
 **Benefits**:
-- Flexibility for different use cases
-- Fallback if Traefik fails
-- Compatibility with tools expecting specific ports
+- Consistent user experience (all apps via subdomains)
+- Centralized authentication via Authelia
+- No port conflicts between apps
+- Cleaner security model (only ports 80/443 exposed)
 
 **Docker Compose Example**:
 ```yaml
 services:
-  signalk:
-    ports:
-      - "3000:3000"  # Direct access
+  grafana:
+    # NO ports section
     labels:
-      - "traefik.enable=true"  # Also via Traefik
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.${HALOS_DOMAIN}`)"
       # ... Traefik configuration
     networks:
-      - default
-      - traefik-net  # Connect to both networks
+      - halos-proxy-network
 ```
+
+### Exception: Apps Requiring Direct Ports
+
+Some apps legitimately need direct port access:
+
+| App | Port | Reason |
+|-----|------|--------|
+| Signal K | 3000 | Host networking for hardware access |
+| AvNav | 34567 | NMEA TCP stream for external tools |
+| AvNav | 8083 | WebSocket for chart plotters |
+
+These apps still get Traefik routing for their HTTP UI, but also expose necessary ports.
 
 ## User Configuration
 
@@ -504,26 +523,41 @@ Since Runtipi is removed (not migrated), no migration needed.
 - Geographic routing (if multiple HaLOS instances)
 - Traefik metrics in Homarr dashboard
 
-## Open Questions (TBD)
+## Resolved Design Decisions
 
-Decisions deferred to implementation phase:
+Previously open questions that have been resolved:
 
-1. **URL Scheme**: Path-based vs subdomain-based vs hybrid?
-2. **Required Dependency**: Should Traefik be required for store packages?
-3. **metadata.json Changes**: Exact schema for Traefik configuration?
-4. **Default HTTPS**: Always use HTTPS (self-signed) or HTTP by default?
+1. **URL Scheme**: Subdomain-based only (e.g., `grafana.halos.local`)
+2. **Direct Port Fallback**: No - apps should not expose ports unless required
+3. **metadata.yaml Schema**: Uses `routing:` key (see SSO_SPEC.md)
+4. **Default HTTPS**: Yes, always HTTPS with self-signed certificates
+5. **Let's Encrypt**: Deferred to future work
 
-**Note**: These will be resolved during Phase 4 planning, before implementation.
+## Implementation Status
+
+### Completed
+- Traefik container with subdomain routing
+- Authelia SSO integration
+- mDNS subdomain advertisement
+- Homarr behind Traefik (root domain)
+- Authelia behind Traefik (auth subdomain)
+
+### In Progress
+- Marine container apps (Grafana, InfluxDB, Signal K, AvNav, OpenCPN)
+- Cockpit web console
+
+### Not Started
+- Let's Encrypt support (future)
 
 ## References
 
 ### Internal Documentation
-- [META-PLANNING.md](../META-PLANNING.md) - Overall project planning
+- [SSO_SPEC.md](../halos-core-containers/docs/SSO_SPEC.md) - SSO technical specification
+- [SSO_ARCHITECTURE.md](../halos-core-containers/docs/SSO_ARCHITECTURE.md) - SSO architecture details
 - [HOMARR_INTEGRATION_DESIGN.md](./HOMARR_INTEGRATION_DESIGN.md) - Dashboard integration
-- [container-packaging-tools/docs/DESIGN.md](../container-packaging-tools/docs/DESIGN.md) - Label generation
+- [HOSTNAME_POLICY.md](./HOSTNAME_POLICY.md) - Policy on hostname references
 
 ### External References
 - [Traefik Documentation](https://doc.traefik.io/traefik/) - Official docs
 - [Traefik Docker Provider](https://doc.traefik.io/traefik/providers/docker/) - Docker label configuration
-- [Traefik Let's Encrypt](https://doc.traefik.io/traefik/https/acme/) - Automatic HTTPS
-- [Runtipi Traefik Config](https://github.com/runtipi/runtipi) - Reference implementation
+- [Authelia Documentation](https://www.authelia.com/configuration/) - SSO provider
