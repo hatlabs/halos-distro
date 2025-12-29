@@ -87,7 +87,7 @@ function pull-all-main {
 
   for repo in "${!REPOS[@]}"; do
     if [ ! -d "$repo" ]; then
-      echo "⚠️  $repo (missing - run 'repos:clone' first)"
+      echo "⚠️  $repo (missing - run 'clone-repos' first)"
       ((missing++))
       continue
     fi
@@ -112,7 +112,7 @@ function pull-all-main {
   fi
 }
 
-function status {
+function show-status {
   #@ Show git status for all repositories
   #@ Category: Repository Management
   echo "📊 Repository status:"
@@ -128,6 +128,36 @@ function status {
     (cd "$repo" && git status -sb)
     echo ""
   done
+}
+
+################################################################################
+# Setup Commands
+
+function install-hooks {
+  #@ Install pre-commit hooks using lefthook
+  #@ Category: Setup
+  if ! command -v lefthook &> /dev/null; then
+    echo "❌ lefthook not found. Install it first:"
+    echo "   brew install lefthook"
+    return 1
+  fi
+
+  echo "🔧 Installing pre-commit hooks..."
+  lefthook install
+  echo "✅ Hooks installed successfully"
+}
+
+function run-hooks {
+  #@ Run pre-commit hooks manually
+  #@ Category: Setup
+  if ! command -v lefthook &> /dev/null; then
+    echo "❌ lefthook not found. Install it first:"
+    echo "   brew install lefthook"
+    return 1
+  fi
+
+  echo "🔍 Running pre-commit hooks..."
+  lefthook run pre-commit
 }
 
 ################################################################################

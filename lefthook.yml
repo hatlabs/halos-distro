@@ -1,0 +1,9 @@
+# Lefthook configuration for halos-distro workspace
+# Install with: lefthook install
+
+pre-commit:
+  parallel: true
+  commands:
+    check-hostnames:
+      run: .github/scripts/check-hardcoded-hostnames.sh
+      fail_text: "Hard-coded hostname references found. See error above for details."
