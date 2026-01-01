@@ -6,9 +6,11 @@
 
 Halos (Hat Labs Operating System) is a containers-first Raspberry Pi distribution with web-based management. Control everything from your browser: browse an app store, install containerized services, and manage your system. No terminal required (YMMV). Works with any Raspberry Pi 4/5 or Hat Labs HALPI2.
 
+![Halos Dashboard](images/homarr_landing_page.jpg)
+
 ## Browser-Based Administration
 
-Halos provides a **unified, browser-based administration experience** through Cockpit. All system management—packages, containers, network configuration—is available from a single web interface using standard Debian tools (APT, systemd, NetworkManager).
+Halos provides a **unified, browser-based administration experience**. Access the dashboard at `https://halos.local/` to see all available services. System management—packages, containers, network configuration—is available through Cockpit using standard Debian tools (APT, systemd, NetworkManager).
 
 ### Why Browser-Based?
 
@@ -33,9 +35,10 @@ Halos provides a **unified, browser-based administration experience** through Co
 
 Halos transforms your Raspberry Pi into a managed server platform with:
 
-- **Web-based system administration** via Cockpit (port 9090)
-- **Container app store** via cockpit-apt with one-click installation
-- **Optional marine software stack** (Signal K, InfluxDB, Grafana) for boats
+- **Unified web interface** with Traefik reverse proxy, Authelia SSO, and Homarr dashboard
+- **Web-based system administration** via Cockpit
+- **Container app store** via cockpit-container-apps with one-click installation
+- **Marine software stack** (Signal K, InfluxDB, Grafana) for boats
 - **HALPI2 hardware support** for CAN bus, RS-485, I2C interfaces and power management
 
 **Use cases:**
@@ -99,14 +102,18 @@ For generic Raspberry Pi, follow these steps:
 ### 3. First Boot
 
 1. Insert the card/drive into your Raspberry Pi and power on
-2. Wait 1-2 minutes for first boot initialization
-3. Use halos.local to access the web interface
+2. Wait 2-3 minutes for first boot initialization and container startup
+3. Access the web interface at [`https://halos.local/`](https://halos.local/)
 
-**Default credentials:**
-- Username: `pi`
-- Password: `raspberry`
+**Self-signed certificate warning**: Your browser will warn about the self-signed certificate. Accept/bypass this warning once per hostname to proceed. It feels like there are many warnings to dismiss, but this is a one-time setup step. Future versions will address this.
 
-**Important:** Change the default password immediately after first login!
+**Default SSO credentials** (Authelia):
+- Username: `admin`
+- Password: `halos`
+
+**Important:** Change the default password immediately after first login via the Cockpit Users panel.
+
+**Backup access**: If the main interface is unavailable, Cockpit is directly accessible at [`https://halos.local:9090/`](https://halos.local:9090/) (uses system user `pi` with password `raspberry`).
 
 ## Installing on Vanilla Raspberry Pi OS
 
@@ -141,75 +148,88 @@ The installation will set up Cockpit and all dependencies. Access the web interf
 
 ## Using Halos
 
-### Web Management Interface
+### Web Interface Architecture
 
-Access Cockpit from any browser on your network at [`https://halos.local:9090/`](https://halos.local:9090/):
+Halos uses a modern reverse proxy architecture:
+
+- **Traefik** (port 80/443): Main entry point, routes requests to services
+- **Authelia**: Single sign-on (SSO) authentication for all services
+- **Homarr**: Dashboard with links to all installed applications
+- **Cockpit**: System administration interface
+
+Access the main interface at [`https://halos.local/`](https://halos.local/). After SSO login, you'll see the Homarr dashboard with links to all available services.
+
+### Cockpit System Management
+
+![Cockpit Overview](images/cockpit_default_screen.jpg)
+
+Cockpit provides comprehensive system administration:
 
 - **Overview**: System resource monitoring and status
 - **Software**: Install and manage packages, including container apps
-- **Terminal**: Command-line access without SSH
+- **Terminal**: Command-line access (SSH is not enabled by default)
 - **Services**: Manage systemd services
 - **Logs**: View system and application logs
 - **Users**: User account management
 
+Access Cockpit via the dashboard or directly at [`https://halos.local:9090/`](https://halos.local:9090/).
+
 ### Installing Container Apps
 
-1. Open Cockpit and navigate to **Software**
+![Container Apps Store](images/cockpit_container_apps.jpg)
+
+1. Open Cockpit and navigate to **Container Apps**
 2. Select a store filter (e.g., "Marine Apps") to browse available applications
 3. Click on an app to view details and install
 4. Installed apps run as systemd services and start automatically
 
 ### Marine Apps
 
+![AvNav Chart Plotter](images/avnav.jpg)
+
 Marine variants include the Marine App Store with applications such as:
 
-- **Signal K** ([`http://halos.local:3000`](http://halos.local:3000)): Marine data server and API
-- **InfluxDB** ([`http://halos.local:8086`](http://halos.local:8086)): Time-series database for marine data
-- **Grafana** ([`http://halos.local:3001`](http://halos.local:3001)): Data visualization and dashboards
-- **AvNav** ([`http://halos.local:3011`](http://halos.local:3011)): Marine navigation software
-- **OpenCPN** ([`http://halos.local:3002`](http://halos.local:3002)): Chartplotter and navigation software
+- **Signal K** ([`https://signalk.halos.local/`](https://signalk.halos.local/)): Marine data server and API
+- **InfluxDB** ([`https://influxdb.halos.local/`](https://influxdb.halos.local/)): Time-series database for marine data
+- **Grafana** ([`https://grafana.halos.local/`](https://grafana.halos.local/)): Data visualization and dashboards
+- **AvNav** ([`https://avnav.halos.local/`](https://avnav.halos.local/)): Marine navigation software
+- **OpenCPN** ([`https://opencpn.halos.local/`](https://opencpn.halos.local/)): Chartplotter and navigation software
 
-Install these from the Marine Apps store in Cockpit.
+Install these from the Marine Apps store in Cockpit. Each subdomain requires accepting the self-signed certificate warning on first access.
 
 ### Terminal Access
 
-- Via Cockpit: Click "Terminal" in the left sidebar
-- Via SSH: `ssh pi@halos.local`
+- **Via Cockpit**: Click "Terminal" in the left sidebar
+- **Via SSH**: Not enabled by default in Desktop images. Enable SSH via Cockpit Services if needed: `sudo systemctl enable --now ssh`
 
-## Known Limitations
+## Known Issues
+
+**First boot timing**: Container services (Traefik, Authelia, Homarr) take 2-3 minutes to start after boot. The main interface at `https://halos.local/` won't respond until all containers are running.
+
+**Container store requires update**: Before the container app store is functional, run a system update:
+```bash
+sudo apt update && sudo apt upgrade
+```
+This can be done via the Cockpit terminal.
+
+**Self-signed certificates**: Each hostname requires accepting the browser security warning once. If you change the hostname, you'll need to accept the certificate again for the new hostname.
+
+## Planned Features
 
 These features are planned but not yet implemented:
-
-- **WiFi configuration in Cockpit**: Cockpit's network module doesn't yet support WiFi setup.
-  - **Workaround**: Access the Cockpit terminal and run `sudo nmtui` to configure WiFi using NetworkManager's text interface.
-
-- **Container app configuration UI**: A dedicated interface for configuring installed container apps is planned. Currently, configuration requires editing files manually.
-
-- **Unified dashboard**: A landing page showing system status and quick links to installed apps is planned but not yet available.
 
 ## Roadmap
 
 Halos development continues with these planned improvements:
 
-### Current Focus: Container Configuration UI
-
-A new Cockpit module for managing installed container apps:
-- List installed apps with status indicators
-- Configuration editor for app settings
-- Service control (start/stop/restart)
-- Log viewer integration
-
 ### Planned Features
 
 - **Expanded app catalog**: More marine and general-purpose container apps
-- **Dashboard integration**: Unified landing page with Homarr
-- **Reverse proxy**: Clean URLs via Traefik (e.g., `halos.local/signalk` instead of `:3000`)
-- **WiFi configuration**: Access point setup, saved networks, QR code sharing
-
-For detailed planning documents, see the `docs/` folder and [META-PLANNING.md](META-PLANNING.md).
+- **Let's Encrypt certificates**: Automatic HTTPS certificates for public-facing installations
 
 ### Get Involved
 
+- **Discussions**: [GitHub Discussions](https://github.com/hatlabs/halos-distro/discussions) - Ask questions, share ideas, and connect with other users
 - **Follow Progress**: [GitHub Issues](https://github.com/hatlabs/halos-distro/issues)
 - **Provide Feedback**: Open issues with feature requests or bug reports
 - **Contribute**: See individual component repositories for contribution guidelines
@@ -221,12 +241,23 @@ This repository acts as a workspace manager for all the components that make up 
 ### Repository Layout
 
 - **halos-pi-gen/** - Custom Raspberry Pi image builder based on pi-gen
-- **cockpit-apt/** - Cockpit package manager with store filtering
-- **cockpit-branding-halos/** - Halos branding for Cockpit
-- **container-packaging-tools/** - Tool for generating container .deb packages
-- **halos-marine-containers/** - Marine app definitions and store configuration
-- **halos-metapackages/** - Halos and Halos-Marine metapackages
 - **apt.hatlabs.fi/** - Custom APT repository for Halos packages
+- **cockpit-apt/** - Cockpit package manager with store filtering
+- **cockpit-authelia-users/** - Authelia user management for Cockpit
+- **cockpit-container-apps/** - Container app management UI
+- **cockpit-dockermanager-debian/** - Docker manager Cockpit plugin
+- **cockpit-networkmanager-halos/** - Cockpit NetworkManager with WiFi features
+- **container-packaging-tools/** - Tool for generating container .deb packages
+- **halos-cockpit-config/** - Cockpit HaLOS config and branding
+- **halos-core-containers/** - Core app definitions (Homarr, Traefik, Authelia)
+- **halos-homarr-branding/** - Homarr HaLOS branding package
+- **halos-imported-containers/** - Auto-imported apps from CasaOS, Runtipi, etc.
+- **halos-marine-containers/** - Marine app definitions and store configuration
+- **halos-mdns-publisher/** - mDNS hostname publisher daemon
+- **halos-metapackages/** - Halos and Halos-Marine metapackages
+- **homarr-container-adapter/** - Homarr first-boot setup and container discovery
+- **opencpn-docker/** - OpenCPN Docker image
+- **shared-workflows/** - Reusable GitHub Actions workflows
 
 Each repository is independently managed. The `./run` script provides convenience commands for cloning and updating all repositories at once.
 
@@ -234,17 +265,17 @@ Each repository is independently managed. The `./run` script provides convenienc
 
 ```bash
 # Clone all component repositories
-./run clone-repos
+./run repos:clone
 
 # Update all repositories to latest
-./run pull-all-main
+./run repos:pull-all-main
 
 # Check status of all repositories
-./run status
+./run repos:status
 
 # Build an image (requires Docker)
 cd halos-pi-gen
-./run docker:build "Halos-Marine-HALPI2"
+./run docker-build "Halos-Marine-HALPI2"
 ```
 
 Each repository has its own `AGENTS.md` with detailed development documentation.
