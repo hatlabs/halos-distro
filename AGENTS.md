@@ -1,6 +1,6 @@
 # HaLOS Workspace - Agentic Coding Hub
 
-**LAST MODIFIED**: 2025-12-29
+**LAST MODIFIED**: 2025-12-31
 
 **Document Purpose**: Central workspace for agentic coding with Claude Code and other AI assistants. This workspace provides full context across all HaLOS repositories for optimal AI-assisted development.
 
@@ -56,18 +56,23 @@ This workspace manages multiple independent repositories. While each repository 
 ```
 halos-distro/
 ├── halos-pi-gen/                  # Image builder
-├── runtipi-marine-app-store/      # Marine app store
 ├── apt.hatlabs.fi/                # Custom APT repo
 ├── cockpit-apt/                   # Cockpit APT package manager
-├── halos-cockpit-branding/        # Cockpit HaLOS branding package
+├── cockpit-authelia-users/        # Authelia user management for Cockpit
+├── cockpit-container-apps/        # Container app management UI
+├── cockpit-dockermanager-debian/  # Docker manager Cockpit plugin
 ├── cockpit-networkmanager-halos/  # Cockpit NetworkManager with WiFi features
-├── halos-homarr-branding/         # Homarr HaLOS branding package
-├── homarr-container-adapter/      # Homarr first-boot setup and container discovery
-├── halos-metapackages/            # HaLOS metapackages (halos, halos-marine)
 ├── container-packaging-tools/     # Container package generator
+├── halos-cockpit-config/          # Cockpit HaLOS config and branding
+├── halos-core-containers/         # Core app definitions (Homarr, Traefik, Authelia)
+├── halos-homarr-branding/         # Homarr HaLOS branding package
+├── halos-imported-containers/     # Auto-imported apps from CasaOS, Runtipi, etc.
 ├── halos-marine-containers/       # Marine app definitions + store
-├── halos-core-containers/         # Core app definitions (Homarr dashboard)
-└── halos-imported-containers/     # Auto-imported apps from CasaOS, Runtipi, etc.
+├── halos-mdns-publisher/          # mDNS hostname publisher daemon
+├── halos-metapackages/            # HaLOS metapackages (halos, halos-marine)
+├── homarr-container-adapter/      # Homarr first-boot setup and container discovery
+├── opencpn-docker/                # OpenCPN Docker image
+└── shared-workflows/              # Reusable GitHub Actions workflows
 ```
 
 **Each repository has its own AGENTS.md** - read the appropriate one for detailed context.
@@ -89,7 +94,7 @@ cd halos-pi-gen
 ## Architecture Layers
 
 1. **Base OS**: Debian-based Raspberry Pi OS (arm64, trixie) built with pi-gen
-2. **Web Management** (all): Cockpit (9090) + Homarr (7575) + Runtipi (80/443)
+2. **Web Management** (all): Traefik (80/443) + Authelia (SSO) + Cockpit (9090) + Homarr (7575)
 3. **Hardware** (HALPI2 only): HALPI2 drivers, CAN, RS-485, I2C
 4. **Marine** (marine variants): Signal K (3000) → InfluxDB (8086) → Grafana (3001)
 
