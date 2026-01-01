@@ -36,6 +36,11 @@
 - [ ] Verify matches SPEC.md
 - [ ] Ensure follows ARCHITECTURE.md
 
+## □ Phase 5.5: DOCUMENT
+- [ ] Run `technical-writer` agent to update AGENTS.md if significant changes
+- [ ] Scrub any inline comments for temporal contamination
+- [ ] Verify no marketing/hedging language in docstrings
+
 ## □ Phase 6: COMMIT
 - [ ] All tests pass
 - [ ] Code linted and formatted

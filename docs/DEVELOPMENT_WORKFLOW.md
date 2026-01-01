@@ -388,6 +388,29 @@ Claude Code Process:
 4. Verify accuracy against code
 5. Commit documentation
 
+### Using the Technical Writer Agent
+
+For documentation tasks, invoke the `technical-writer` agent:
+- Creating or updating AGENTS.md files
+- Cleaning up comments after implementation
+- Reviewing documentation for LLM-optimization
+- Ensuring present-tense, token-efficient docs
+
+The agent enforces:
+- **No temporal contamination**: "Added", "Changed", "Previously" → present tense only
+- **No marketing language**: "robust", "elegant", "seamless" → technical descriptions
+- **WHY-focused comments**: Comments explain reasoning, not what code does
+- **Tabular navigation**: AGENTS.md files use tables for quick lookup
+
+Integration points in the workflow:
+
+| Workflow Phase | Technical Writer Usage |
+|----------------|------------------------|
+| Post-implementation | Update AGENTS.md with new file/module entries |
+| Before PR | Scrub plan comments that leaked into code |
+| New repository setup | Create initial AGENTS.md structure |
+| Refactoring | Update documentation to reflect new structure |
+
 ## Success Metrics
 
 A successful implementation:
