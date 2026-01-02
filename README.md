@@ -6,6 +6,8 @@
 
 Halos (Hat Labs Operating System) is a containers-first Raspberry Pi distribution with web-based management. Control everything from your browser: browse an app store, install containerized services, and manage your system. No terminal required (YMMV). Works with any Raspberry Pi 4/5 or Hat Labs HALPI2.
 
+> Want to support this project? Consider purchasing a [HALPI2 computer](https://shop.hatlabs.fi/products/halpi2-computer)!
+
 ![Halos Dashboard](images/homarr_landing_page.jpg)
 
 ## Browser-Based Administration
