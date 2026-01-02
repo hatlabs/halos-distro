@@ -1,5 +1,15 @@
 # Halos Raspberry Pi OS Distribution
 
+## TL;DR
+
+- Download the image you want at https://github.com/hatlabs/halos-pi-gen/releases/latest
+- Flash to SSD or SD-card
+- Boot the device
+- Access https://halos.local (assuming wired Ethernet connection)
+- Web admin account and password: admin/halos
+- System user account and password: pi/halos
+
+----
 > **⚠️ IMPORTANT: Work in Progress**
 >
 > Halos is under active development and is not feature complete. Major features are still missing. Use in production environments at your own risk. Feedback and bug reports are welcome!
