@@ -1,6 +1,6 @@
 # HaLOS Workspace - Agentic Coding Hub
 
-**LAST MODIFIED**: 2025-12-31
+**LAST MODIFIED**: 2026-01-02
 
 **Document Purpose**: Central workspace for agentic coding with Claude Code and other AI assistants. This workspace provides full context across all HaLOS repositories for optimal AI-assisted development.
 
@@ -49,7 +49,9 @@ This workspace manages multiple independent repositories. While each repository 
 
 **PR Reviews**: When reviewing pull requests, always post review comments directly on the PR itself using `gh pr comment`. This ensures feedback is visible to all stakeholders and preserved in the project history.
 
-**Pre-commit Hooks**: Repositories use [lefthook](https://github.com/evilmartians/lefthook) for pre-commit hooks. After cloning, install hooks with `./run hooks-install`. See `docs/LIFE_WITH_CLAUDE.md` for details.
+**Pre-commit Hooks**: Repositories use [lefthook](https://github.com/evilmartians/lefthook) for pre-commit hooks. After cloning, install hooks with `./run install-hooks`. See `docs/LIFE_WITH_CLAUDE.md` for details.
+
+**Changelog Policy**: Never edit `debian/changelog` files directly. Always use `./run bumpversion` which uses the `dch` tool for proper RFC 2822 date formatting. Direct edits cause weekday/date mismatches that break Debian tools. See individual repository AGENTS.md for details.
 
 ## Structure
 
